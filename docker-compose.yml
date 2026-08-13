@@ -18,30 +18,30 @@ services:
 
   backend_api:
     build:
-      context: ./src/backend
+      context: ./AppointmentApi
       dockerfile: Dockerfile
     container_name: appointment_api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres_db;Database=appointment_db;Username=admin;Password=SecretPassword123!
-      - Jwt__Secret=SUPER_SECRET_KEY_FOR_JWT_AUTHENTICATION_DEVELOPMENT_ONLY
-      - Google__ClientId=${GOOGLE_CLIENT_ID}
-      - Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+    # - Jwt__Secret=SUPER_SECRET_KEY_FOR_JWT_AUTHENTICATION_DEVELOPMENT_ONLY
+    # - Google__ClientId=${GOOGLE_CLIENT_ID}
+    # - Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
     ports:
-      - "5000:8080"
+      - "8081:8080"
     depends_on:
       postgres_db:
         condition: service_healthy
 
-  frontend_app:
-    build:
-      context: ./src/frontend
-      dockerfile: Dockerfile
-    container_name: appointment_ui
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend_api
+#  frontend_app:
+#    build:
+#      context: ./src/frontend
+#      dockerfile: Dockerfile
+#    container_name: appointment_ui
+#    ports:
+#      - "4200:80"
+#    depends_on:
+#      - backend_api
 
 volumes:
   pgdata:
