@@ -1,0 +1,65 @@
+##   Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Re]leases/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+bbin/
+bin/
+obj/
+
+##   Visual Studio Tooling
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+##   Rider / IntelliJ / WebStorm IDEs
+.idea/
+*.sln.iml
+
+##   Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+##   User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+##   Roslyn Analyzers & Caches
+.benchmarks/
+*.atp
+.ionide/
+
+##   Crash dumps & Traces
+*.tss
+*.log
+*.binlog
+*.tracelog
+
+##   Packages and Publishing
+*.nupkg
+**/packages/
+**/project.lock.json
+**/project.fragment.lock.json
+
+##   Secrets and Configurations
+# Un-comment the line below if you intentionally want to keep local appsettings secret.
+# appsettings.Development.json
+.env
+*.pem
+
+##   OS generated files
+.DS_Store
+Thumbs.db

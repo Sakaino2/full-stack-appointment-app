@@ -1,0 +1,47 @@
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: appointment_db
+    environment:
+      POSTGRES_DB: appointment_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: SecretPassword123!
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d appointment_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend_api:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: appointment_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres_db;Database=appointment_db;Username=admin;Password=SecretPassword123!
+      - Jwt__Secret=SUPER_SECRET_KEY_FOR_JWT_AUTHENTICATION_DEVELOPMENT_ONLY
+      - Google__ClientId=${GOOGLE_CLIENT_ID}
+      - Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "5000:8080"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  frontend_app:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: appointment_ui
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend_api
+
+volumes:
+  pgdata:
