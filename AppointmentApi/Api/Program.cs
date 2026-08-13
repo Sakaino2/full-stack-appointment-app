@@ -18,6 +18,8 @@ builder.Services.AddScoped<IApplicationDbContext>(provider =>
 
 builder.Services.AddScoped<IGoogleCalendarService, MockGoogleCalendarService>();
 
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -25,12 +27,15 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+
+        await dbContext.Database.MigrateAsync();
         await DatabaseSeeder.SeedAdminUserAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
     }
 }
 
