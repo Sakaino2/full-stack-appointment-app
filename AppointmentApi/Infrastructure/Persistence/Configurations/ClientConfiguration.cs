@@ -2,13 +2,13 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AppointmentApi.Infrastructure.Persistence.Configurations;
+namespace Infrastructure.Persistence.Configurations;
 
 public class ClientConfiguration : IEntityTypeConfiguration<Client>
 {
     public void Configure(EntityTypeBuilder<Client> builder)
     {
-        builder.ToTable("Clients");
+        builder.ToTable("clients");
 
         builder.HasKey(c => c.Id);
 

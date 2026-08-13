@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 public interface IApplicationDbContext
 {
-    DbSet<AdminUser> AdminUsers { get; }
+    DbSet<User> AdminUsers { get; }
     DbSet<Client> Clients { get; }
     DbSet<Appointment> Appointments { get; }
 

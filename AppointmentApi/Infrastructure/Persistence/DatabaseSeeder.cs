@@ -11,25 +11,47 @@ public static class DatabaseSeeder
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        // Ensure database is created and pending migrations are applied
         await context.Database.MigrateAsync();
 
-        // Check if admin user already exists
         if (!await context.AdminUsers.AnyAsync())
         {
-            var passwordHasher = new PasswordHasher<AdminUser>();
+            var passwordHasher = new PasswordHasher<User>();
 
-            var defaultAdmin = new AdminUser
+            var defaultAdmin = new User
             {
                 Id = Guid.NewGuid(),
                 Username = "admin",
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Securely hash initial password "AdminPassword123!"
             defaultAdmin.PasswordHash = passwordHasher.HashPassword(defaultAdmin, "AdminPassword123!");
 
             await context.AdminUsers.AddAsync(defaultAdmin);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public static async Task SeedClientAsync(IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        await context.Database.MigrateAsync();
+
+        if (!await context.Clients.AnyAsync())
+        {
+
+            var testClient = new Client
+            {
+                Id = Guid.NewGuid(),
+                FullName = "test user 1",
+                Email = "test@user.com",
+                Phone = "+51999888777",
+                CreatedAt = DateTime.UtcNow
+            };
+
+
+            await context.Clients.AddAsync(testClient);
             await context.SaveChangesAsync();
         }
     }

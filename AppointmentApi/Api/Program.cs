@@ -31,6 +31,7 @@ using (var scope = app.Services.CreateScope())
 
         await dbContext.Database.MigrateAsync();
         await DatabaseSeeder.SeedAdminUserAsync(services);
+        await DatabaseSeeder.SeedClientAsync(services);
     }
     catch (Exception ex)
     {

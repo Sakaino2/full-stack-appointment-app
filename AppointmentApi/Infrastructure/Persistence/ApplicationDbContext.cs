@@ -5,13 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
 
-public class ApplicationDbContext : DbContext, IApplicationDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
-
-    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<User> AdminUsers => Set<User>();
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
 

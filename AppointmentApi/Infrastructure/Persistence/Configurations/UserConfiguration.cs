@@ -2,13 +2,13 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AppointmentApi.Infrastructure.Persistence.Configurations;
+namespace Infrastructure.Persistence.Configurations;
 
-public class AdminUserConfiguration : IEntityTypeConfiguration<AdminUser>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<AdminUser> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("AdminUsers");
+        builder.ToTable("users");
 
         builder.HasKey(a => a.Id);
 
