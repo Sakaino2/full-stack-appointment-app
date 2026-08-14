@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-//[Authorize] // Requires Admin JWT authentication
+[Authorize] // Requires Admin JWT authentication
 public class AppointmentsController(IAppointmentService appointmentService) : ControllerBase
 {
     private readonly IAppointmentService _appointmentService = appointmentService;

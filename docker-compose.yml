@@ -24,7 +24,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres_db;Database=appointment_db;Username=admin;Password=SecretPassword123!
-    # - Jwt__Secret=SUPER_SECRET_KEY_FOR_JWT_AUTHENTICATION_DEVELOPMENT_ONLY
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=${JWT_ISSUER}
+      - JwtSettings__Audience=${JWT_AUDIENCE}
     # - Google__ClientId=${GOOGLE_CLIENT_ID}
     # - Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
     ports:

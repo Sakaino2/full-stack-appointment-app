@@ -2,16 +2,11 @@ using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Infrastructure.ExternalServices.GoogleCalendar;
 
-public class MockGoogleCalendarService : IGoogleCalendarService
+public class MockGoogleCalendarService(ILogger<MockGoogleCalendarService> logger) : IGoogleCalendarService
 {
-    private readonly ILogger<MockGoogleCalendarService> _logger;
-
-    public MockGoogleCalendarService(ILogger<MockGoogleCalendarService> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<MockGoogleCalendarService> _logger = logger;
 
     public Task<string?> CreateEventAsync(Appointment appointment, Client client, CancellationToken cancellationToken = default)
     {

@@ -1,33 +1,28 @@
+using Application.Dtos;
+using Application.Interfaces;
 using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence;
 
 public static class DatabaseSeeder
 {
-    public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
+    public static async Task SeedAdminUserAsync(IServiceProvider services)
     {
-        using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var userService = services.GetRequiredService<IUserService>();
 
-        await context.Database.MigrateAsync();
+        const string adminUsername = "admin";
 
-        if (!await context.AdminUsers.AnyAsync())
+        if (!await userService.UserExistsAsync(adminUsername))
         {
-            var passwordHasher = new PasswordHasher<User>();
+            var adminDto = new CreateUserDto(
+                Username: adminUsername,
+                Password: "YourAdminPassword123!",
+                Role: "Admin"
+            );
 
-            var defaultAdmin = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = "admin",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            defaultAdmin.PasswordHash = passwordHasher.HashPassword(defaultAdmin, "AdminPassword123!");
-
-            await context.AdminUsers.AddAsync(defaultAdmin);
-            await context.SaveChangesAsync();
+            await userService.CreateUserAsync(adminDto);
         }
     }
 
