@@ -1,10 +1,10 @@
 namespace Application.Interfaces;
 
-using Domain.Entities;
+using Application.Dtos;
 
 public interface IGoogleCalendarService
 {
-    Task<string?> CreateEventAsync(Appointment appointment, Client client, CancellationToken cancellationToken = default);
-    Task UpdateEventAsync(Appointment appointment, Client client, CancellationToken cancellationToken = default);
-    Task DeleteEventAsync(string googleCalendarEventId, CancellationToken cancellationToken = default);
+    Task<string?> CreateEventAsync(CalendarEventDto eventDto, CancellationToken ct = default);
+    Task<bool> UpdateEventAsync(string eventId, CalendarEventDto eventDto, CancellationToken ct = default);
+    Task<bool> DeleteEventAsync(string eventId, CancellationToken ct = default);
 }

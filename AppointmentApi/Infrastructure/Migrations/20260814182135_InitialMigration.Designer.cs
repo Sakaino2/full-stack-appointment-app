@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260814000556_InitialMigration")]
+    [Migration("20260814182135_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -40,9 +40,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTime>("EndTimeUtc")
+                    b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_time_utc");
+                        .HasColumnName("end_time");
 
                     b.Property<string>("GoogleCalendarEventId")
                         .HasMaxLength(250)
@@ -54,9 +54,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("notes");
 
-                    b.Property<DateTime>("StartTimeUtc")
+                    b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_time_utc");
+                        .HasColumnName("start_time");
 
                     b.Property<string>("Status")
                         .IsRequired()

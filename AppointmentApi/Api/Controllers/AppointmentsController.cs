@@ -40,7 +40,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
     [HttpPost]
     public async Task<ActionResult<AppointmentResponseDto>> Create([FromBody] CreateAppointmentDto dto, CancellationToken ct)
     {
-        if (dto.EndTimeUtc <= dto.StartTimeUtc)
+        if (dto.EndTime <= dto.StartTime)
         {
             return BadRequest("EndTime must be later than StartTime.");
         }
@@ -62,7 +62,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
     [HttpPatch("{id:guid}/reschedule")]
     public async Task<ActionResult<AppointmentResponseDto>> Reschedule(Guid id, [FromBody] RescheduleAppointmentDto dto, CancellationToken ct)
     {
-        if (dto.NewEndTimeUtc <= dto.NewStartTimeUtc)
+        if (dto.NewEndTime <= dto.NewStartTime)
         {
             return BadRequest("NewEndTime must be later than NewStartTime.");
         }
@@ -79,7 +79,7 @@ public class AppointmentsController(IAppointmentService appointmentService) : Co
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<AppointmentResponseDto>> Update(Guid id, [FromBody] UpdateAppointmentDto dto, CancellationToken ct)
     {
-        if (dto.EndTimeUtc <= dto.StartTimeUtc)
+        if (dto.EndTime <= dto.StartTime)
         {
             return BadRequest("EndTime must be later than StartTime.");
         }

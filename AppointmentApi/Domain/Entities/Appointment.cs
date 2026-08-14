@@ -16,8 +16,8 @@ public class Appointment
 
     public string Title { get; set; } = string.Empty;
     public string? Notes { get; set; }
-    public DateTime StartTimeUtc { get; set; }
-    public DateTime EndTimeUtc { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
 
     public string? GoogleCalendarEventId { get; set; }

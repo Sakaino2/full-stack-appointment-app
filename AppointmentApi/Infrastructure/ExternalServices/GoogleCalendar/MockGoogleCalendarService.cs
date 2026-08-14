@@ -1,28 +1,41 @@
-using Application.Interfaces;
-using Domain.Entities;
-using Microsoft.Extensions.Logging;
-
 namespace Infrastructure.ExternalServices.GoogleCalendar;
 
-public class MockGoogleCalendarService(ILogger<MockGoogleCalendarService> logger) : IGoogleCalendarService
+using Application.Dtos;
+using Application.Interfaces;
+using Microsoft.Extensions.Logging;
+
+public class MockGoogleCalendarService : IGoogleCalendarService
 {
-    private readonly ILogger<MockGoogleCalendarService> _logger = logger;
+    private readonly ILogger<MockGoogleCalendarService> _logger;
 
-    public Task<string?> CreateEventAsync(Appointment appointment, Client client, CancellationToken cancellationToken = default)
+    public MockGoogleCalendarService(ILogger<MockGoogleCalendarService> logger)
     {
-        _logger.LogInformation("[MOCK] Google Calendar Create skipped for Appointment ID: {Id}", appointment.Id);
-        return Task.FromResult<string?>("mock-event-id-123");
+        _logger = logger;
     }
 
-    public Task UpdateEventAsync(Appointment appointment, Client client, CancellationToken cancellationToken = default)
+    public Task<string?> CreateEventAsync(CalendarEventDto eventDto, CancellationToken ct = default)
     {
-        _logger.LogInformation("[MOCK] Google Calendar Update skipped for Appointment ID: {Id}", appointment.Id);
-        return Task.CompletedTask;
+        var mockEventId = $"mock_evt_{Guid.NewGuid():N}";
+        _logger.LogInformation(
+            "[MOCK CALENDAR] Event Created: '{Summary}' for {ClientEmail} | Start: {StartUtc} | MockId: {MockEventId}",
+            eventDto.Summary, eventDto.ClientEmail, eventDto.StartUtc, mockEventId);
+
+        return Task.FromResult<string?>(mockEventId);
     }
 
-    public Task DeleteEventAsync(string eventId, CancellationToken cancellationToken = default)
+    public Task<bool> UpdateEventAsync(string eventId, CalendarEventDto eventDto, CancellationToken ct = default)
     {
-        _logger.LogInformation("[MOCK] Google Calendar Delete skipped for Event ID: {EventId}", eventId);
-        return Task.CompletedTask;
+        _logger.LogInformation(
+            "[MOCK CALENDAR] Event Updated: ID '{EventId}' -> '{Summary}' for {ClientEmail}",
+            eventId, eventDto.Summary, eventDto.ClientEmail);
+
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> DeleteEventAsync(string eventId, CancellationToken ct = default)
+    {
+        _logger.LogInformation("[MOCK CALENDAR] Event Deleted: ID '{EventId}'", eventId);
+
+        return Task.FromResult(true);
     }
 }

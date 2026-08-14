@@ -8,5 +8,5 @@ public record LoginRequestDto(
 public record LoginResponseDto(
     string Token,
     string Username,
-    DateTime ExpiresAtUtc
+    DateTime ExpiresAt
 );

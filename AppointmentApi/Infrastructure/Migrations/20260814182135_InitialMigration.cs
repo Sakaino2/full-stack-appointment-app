@@ -51,8 +51,8 @@ namespace Infrastructure.Migrations
                     client_id = table.Column<Guid>(type: "uuid", nullable: false),
                     title = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-                    start_time_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    end_time_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    start_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    end_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     google_calendar_event_id = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)

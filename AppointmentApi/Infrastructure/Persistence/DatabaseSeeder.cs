@@ -2,7 +2,6 @@ using Application.Dtos;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence;
 
@@ -40,7 +39,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 FullName = "test user 1",
-                Email = "test@user.com",
+                Email = "jorgesakaino@gmail.com",
                 Phone = "+51999888777",
                 CreatedAt = DateTime.UtcNow
             };

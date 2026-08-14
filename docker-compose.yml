@@ -27,8 +27,10 @@ services:
       - JwtSettings__Secret=${JWT_SECRET}
       - JwtSettings__Issuer=${JWT_ISSUER}
       - JwtSettings__Audience=${JWT_AUDIENCE}
-    # - Google__ClientId=${GOOGLE_CLIENT_ID}
-    # - Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+      - GoogleCalendarSettings__ClientId=${GOOGLE_CALENDAR_CLIENT_ID}
+      - GoogleCalendarSettings__ClientSecret=${GOOGLE_CALENDAR_CLIENT_SECRET}
+      - GoogleCalendarSettings__RefreshToken=${GOOGLE_CALENDAR_REFRESH_TOKEN}
+      - GoogleCalendarSettings__CalendarId=${GOOGLE_CALENDAR_ID:-primary}
     ports:
       - "8081:8080"
     depends_on:

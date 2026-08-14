@@ -59,6 +59,7 @@ obj/
 # appsettings.Development.json
 .env
 *.pem
+secrets/
 
 ##   OS generated files
 .DS_Store

@@ -6,21 +6,14 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-public class AppointmentService : IAppointmentService
+public class AppointmentService(
+    IApplicationDbContext context,
+    IGoogleCalendarService googleCalendarService,
+    ILogger<AppointmentService> logger) : IAppointmentService
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IGoogleCalendarService _googleCalendarService;
-    private readonly ILogger<AppointmentService> _logger;
-
-    public AppointmentService(
-        IApplicationDbContext context,
-        IGoogleCalendarService googleCalendarService,
-        ILogger<AppointmentService> logger)
-    {
-        _context = context;
-        _googleCalendarService = googleCalendarService;
-        _logger = logger;
-    }
+    private readonly IApplicationDbContext _context = context;
+    private readonly IGoogleCalendarService _googleCalendarService = googleCalendarService;
+    private readonly ILogger<AppointmentService> _logger = logger;
 
     public async Task<IEnumerable<AppointmentResponseDto>> GetUpcomingAppointmentsAsync(int count = 10, CancellationToken cancellationToken = default)
     {
@@ -29,8 +22,8 @@ public class AppointmentService : IAppointmentService
         return await _context.Appointments
             .AsNoTracking()
             .Include(a => a.Client)
-            .Where(a => a.StartTimeUtc >= nowUtc && a.Status != AppointmentStatus.Cancelled)
-            .OrderBy(a => a.StartTimeUtc)
+            .Where(a => a.StartTime >= nowUtc && a.Status != AppointmentStatus.Cancelled)
+            .OrderBy(a => a.StartTime)
             .Take(count)
             .Select(a => MapToResponseDto(a))
             .ToListAsync(cancellationToken);
@@ -58,15 +51,16 @@ public class AppointmentService : IAppointmentService
             Client = client,
             Title = dto.Title,
             Notes = dto.Notes,
-            StartTimeUtc = dto.StartTimeUtc.ToUniversalTime(),
-            EndTimeUtc = dto.EndTimeUtc.ToUniversalTime(),
+            StartTime = dto.StartTime.ToUniversalTime(),
+            EndTime = dto.EndTime.ToUniversalTime(),
             Status = AppointmentStatus.Scheduled,
             CreatedAt = DateTime.UtcNow
         };
 
         try
         {
-            var eventId = await _googleCalendarService.CreateEventAsync(appointment, client, cancellationToken);
+            var calendarDto = MapToCalendarDto(appointment, client);
+            var eventId = await _googleCalendarService.CreateEventAsync(calendarDto, cancellationToken);
             appointment.GoogleCalendarEventId = eventId;
         }
         catch (Exception ex)
@@ -88,15 +82,16 @@ public class AppointmentService : IAppointmentService
 
         if (appointment is null) return null;
 
-        appointment.StartTimeUtc = dto.NewStartTimeUtc.ToUniversalTime();
-        appointment.EndTimeUtc = dto.NewEndTimeUtc.ToUniversalTime();
+        appointment.StartTime = dto.NewStartTime.ToUniversalTime();
+        appointment.EndTime = dto.NewEndTime.ToUniversalTime();
         appointment.Status = AppointmentStatus.Rescheduled;
 
         if (!string.IsNullOrEmpty(appointment.GoogleCalendarEventId))
         {
             try
             {
-                await _googleCalendarService.UpdateEventAsync(appointment, appointment.Client, cancellationToken);
+                var calendarDto = MapToCalendarDto(appointment, appointment.Client);
+                await _googleCalendarService.UpdateEventAsync(appointment.GoogleCalendarEventId, calendarDto, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -118,15 +113,16 @@ public class AppointmentService : IAppointmentService
 
         appointment.Title = dto.Title;
         appointment.Notes = dto.Notes;
-        appointment.StartTimeUtc = dto.StartTimeUtc.ToUniversalTime();
-        appointment.EndTimeUtc = dto.EndTimeUtc.ToUniversalTime();
+        appointment.StartTime = dto.StartTime.ToUniversalTime();
+        appointment.EndTime = dto.EndTime.ToUniversalTime();
         appointment.Status = dto.Status;
 
         if (!string.IsNullOrEmpty(appointment.GoogleCalendarEventId))
         {
             try
             {
-                await _googleCalendarService.UpdateEventAsync(appointment, appointment.Client, cancellationToken);
+                var calendarDto = MapToCalendarDto(appointment, appointment.Client);
+                await _googleCalendarService.UpdateEventAsync(appointment.GoogleCalendarEventId, calendarDto, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -160,6 +156,17 @@ public class AppointmentService : IAppointmentService
         return true;
     }
 
+    private static CalendarEventDto MapToCalendarDto(Appointment appointment, Client client) =>
+        new(
+        Summary: appointment.Title,
+        Description: appointment.Notes ?? string.Empty,
+        Location: "Consultation Room / Online",
+        StartUtc: appointment.StartTime,
+        EndUtc: appointment.EndTime,
+        ClientEmail: client.Email,
+        TimeZone: "UTC"
+    );
+
     private static AppointmentResponseDto MapToResponseDto(Appointment a) =>
         new(
             a.Id,
@@ -168,8 +175,8 @@ public class AppointmentService : IAppointmentService
             a.Client.Email,
             a.Title,
             a.Notes,
-            a.StartTimeUtc,
-            a.EndTimeUtc,
+            a.StartTime,
+            a.EndTime,
             a.Status,
             a.GoogleCalendarEventId,
             a.CreatedAt
