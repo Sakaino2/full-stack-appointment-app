@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  # ============ BACKEND - DESARROLLO ============
+  backend_api:
+    build:
+      target: development
+    container_name: appointment_api_dev
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./AppointmentApi:/app
+      - /app/bin
+      - /app/obj
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    command: dotnet watch run --urls=http://0.0.0.0:8080 --project Api/Api.csproj
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # ⬅️ IMPORTANTE
+
+  # ============ FRONTEND - DESARROLLO ============
+  frontend_app:
+    build:
+      target: development
+    container_name: appointment_ui_dev
+    ports:
+      - "4200:4200"
+      - "49153:49153"
+    volumes:
+      - ./appointment-frontend:/app
+      - /app/node_modules
+      - /app/dist
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # ⬅️ IMPORTANTE
+    command: ng serve --host 0.0.0.0 --poll 2000
+
+  # ============ POSTGRES - DESARROLLO ============
+  postgres_db:
+    container_name: appointment_db_dev
+    ports:
+      - "5432:5432"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

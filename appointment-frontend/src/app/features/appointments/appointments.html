@@ -1,0 +1,111 @@
+<div class="appointments-container">
+  <h2>Appointment Management</h2>
+
+  <!-- Error Notification -->
+  @if (appointmentService.error()) {
+    <div class="alert alert-danger">
+      {{ appointmentService.error() }}
+    </div>
+  }
+
+  <!-- Appointment Form (Create/Edit) -->
+  <div class="form-card">
+    <h3>{{ editingId() ? 'Edit Appointment' : 'New Appointment' }}</h3>
+
+    <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="summary">Title / Summary *</label>
+          <input
+            id="summary"
+            type="text"
+            formControlName="summary"
+            placeholder="Client Consultation"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="clientEmail">Client Email *</label>
+          <input
+            id="clientEmail"
+            type="email"
+            formControlName="clientEmail"
+            placeholder="client@example.com"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startUtc">Start Time *</label>
+          <input id="startUtc" type="datetime-local" formControlName="startUtc" />
+        </div>
+
+        <div class="form-group">
+          <label for="endUtc">End Time *</label>
+          <input id="endUtc" type="datetime-local" formControlName="endUtc" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Notes / Description</label>
+        <textarea id="description" formControlName="description" rows="3"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          [disabled]="appointmentForm.invalid || appointmentService.isLoading()"
+        >
+          {{ editingId() ? 'Update Appointment' : 'Schedule Appointment' }}
+        </button>
+
+        @if (editingId()) {
+          <button type="button" class="btn-secondary" (click)="resetForm()">Cancel</button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <!-- Appointments Table -->
+  <div class="table-card">
+    <h3>Scheduled Appointments</h3>
+
+    @if (appointmentService.isLoading()) {
+      <p>Loading appointments...</p>
+    } @else if (appointmentService.appointments().length === 0) {
+      <p>No appointments found.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Client</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of appointmentService.appointments(); track item.id) {
+            <tr>
+              <td>
+                <strong>{{ item.title }}</strong>
+                @if (item.notes) {
+                  <br /><small>{{ item.notes }}</small>
+                }
+              </td>
+              <td>{{ item.clientEmail }}</td>
+              <td>{{ item.startTimeUtc | date: 'short' }}</td>
+              <td>{{ item.endTimeUtc | date: 'short' }}</td>
+              <td>
+                <button class="btn-sm" (click)="onEdit(item)">Edit</button>
+                <button class="btn-sm btn-danger" (click)="onDelete(item.id)">Delete</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

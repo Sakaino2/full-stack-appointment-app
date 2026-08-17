@@ -1,4 +1,7 @@
+version: "3.8"
+
 services:
+  # ============ BASE DE DATOS ============
   postgres_db:
     image: postgres:16-alpine
     container_name: appointment_db
@@ -15,14 +18,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - appointment_network
 
+  # ============ BACKEND - BASE ============
   backend_api:
     build:
       context: ./AppointmentApi
       dockerfile: Dockerfile
-    container_name: appointment_api
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres_db;Database=appointment_db;Username=admin;Password=SecretPassword123!
       - JwtSettings__Secret=${JWT_SECRET}
       - JwtSettings__Issuer=${JWT_ISSUER}
@@ -31,21 +35,25 @@ services:
       - GoogleCalendarSettings__ClientSecret=${GOOGLE_CALENDAR_CLIENT_SECRET}
       - GoogleCalendarSettings__RefreshToken=${GOOGLE_CALENDAR_REFRESH_TOKEN}
       - GoogleCalendarSettings__CalendarId=${GOOGLE_CALENDAR_ID:-primary}
-    ports:
-      - "8081:8080"
     depends_on:
       postgres_db:
         condition: service_healthy
+    networks:
+      - appointment_network
 
-#  frontend_app:
-#    build:
-#      context: ./src/frontend
-#      dockerfile: Dockerfile
-#    container_name: appointment_ui
-#    ports:
-#      - "4200:80"
-#    depends_on:
-#      - backend_api
+  # ============ FRONTEND - BASE ============
+  frontend_app:
+    build:
+      context: ./appointment-frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend_api
+    networks:
+      - appointment_network
 
 volumes:
   pgdata:
+
+networks:
+  appointment_network:
+    driver: bridge

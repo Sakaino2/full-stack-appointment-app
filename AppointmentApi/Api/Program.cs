@@ -11,6 +11,32 @@ using Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ============ CONFIGURACIÓN DE CORS ============
+// Agregar CORS antes que cualquier otra configuración
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()      // Permite cualquier origen
+              .AllowAnyMethod()      // Permite cualquier método (GET, POST, PUT, DELETE, etc.)
+              .AllowAnyHeader();     // Permite cualquier encabezado
+    });
+
+    // Opción más segura para desarrollo (recomendada)
+    options.AddPolicy("AllowAngularDev", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:4200",           // Angular en desarrollo
+                "http://localhost:4201",           // Angular en producción local
+                "http://host.docker.internal:4200" // Desde Docker
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); // Permite enviar cookies/tokens
+    });
+});
+
+// ============ CONFIGURACIÓN DE SERVICIOS ============
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<GoogleCalendarSettings>(
     builder.Configuration.GetSection(GoogleCalendarSettings.SectionName));
@@ -31,7 +57,6 @@ builder.Services.AddScoped<IGoogleCalendarService, GoogleCalendarService>();
 
 var jwtSecret = builder.Configuration["JwtSettings:Secret"]
     ?? throw new InvalidOperationException("JwtSettings:Secret is missing.");
-
 
 builder.Services.AddAuthentication(options =>
 {
@@ -55,13 +80,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// ============ MIGRACIONES Y SEED ============
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -79,10 +104,17 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// ============ MIDDLEWARE ============
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// IMPORTANTE: CORS debe ir ANTES de UseRouting y UseAuthentication
+app.UseCors("AllowAngularDev");  // Usar la política específica para Angular
+
+// O si prefieres permitir todo (menos seguro):
+// app.UseCors("AllowAll");
 
 app.UseRouting();
 app.UseAuthentication();

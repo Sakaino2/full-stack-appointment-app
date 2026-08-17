@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  # ============ BACKEND - PRODUCCIÓN ============
+  backend_api:
+    build:
+      target: production
+    container_name: appointment_api_prod
+    ports:
+      - "8082:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    restart: always
+
+  # ============ FRONTEND - PRODUCCIÓN ============
+  frontend_app:
+    build:
+      target: production
+    container_name: appointment_ui_prod
+    ports:
+      - "4201:80"
+    restart: always
+
+  # ============ POSTGRES - PRODUCCIÓN ============
+  postgres_db:
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
